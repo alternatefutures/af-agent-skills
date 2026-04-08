@@ -1,0 +1,12 @@
+{
+  "name": "af-cli",
+  "description": "AlternateFutures CLI — deploy services, manage projects, SSH into workloads, and check billing from the terminal",
+  "version": "0.1.0",
+  "author": {
+    "name": "Alternate Futures",
+    "email": "dev@alternatefutures.ai"
+  },
+  "license": "AGPL-3.0-only",
+  "homepage": "https://alternatefutures.ai",
+  "keywords": ["cli", "cloud", "deploy", "akash", "decentralized"]
+}

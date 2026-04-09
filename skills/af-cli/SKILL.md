@@ -129,6 +129,7 @@ af services deploy my-service
 ```
 
 If a deployment is running, the CLI prompts to close it first, then deploys fresh.
+The deploy command shows **real-time step-by-step progress** (creating tx → waiting bids → creating lease → sending manifest → container starting → live). It polls the backend every 3 seconds and exits when the deployment reaches a terminal state (ACTIVE, FAILED, CLOSED). On success it prints provider info and service URLs.
 
 **Check what's running:**
 

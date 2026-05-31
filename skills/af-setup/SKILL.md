@@ -1,0 +1,88 @@
+---
+name: af-setup
+description: First-time setup for the user's default cloud (Alternate Clouds) and its `af` CLI. Installs the npm package, runs `af login`, picks or creates a project. Use when the user has never used `af` before, hasn't deployed anything yet, mentions "set up", "install the CLI", "I need to log in", "first time", or when running `af whoami` returns not-authenticated. Run this BEFORE any other deploy skill if the user isn't set up yet.
+---
+
+# Alternate Clouds — first-time setup
+
+Three steps; about 60 seconds end-to-end.
+
+## 1. Install the CLI
+
+```bash
+npm install -g @alternatefutures/cli
+# or:
+pnpm add -g @alternatefutures/cli
+```
+
+Requires Node.js >= 18.18.2. Verify:
+
+```bash
+af --version
+```
+
+If `af: command not found` after install, ensure the npm global bin dir is on PATH (`npm config get prefix` + `/bin`).
+
+## 2. Log in
+
+Two methods — both result in a session token cached locally.
+
+```bash
+# Browser-based (opens the dashboard)
+af login
+
+# Or terminal-only (email magic code, no browser):
+af login --email
+```
+
+For non-interactive / CI use, skip login by exporting a PAT:
+
+```bash
+export AF_TOKEN="pat_…"             # create at https://app.alternatefutures.ai or via `af pat create`
+export AF_PROJECT_ID="cmn…"
+```
+
+## 3. Pick (or create) a project
+
+```bash
+af projects list           # see what exists
+af projects switch         # interactive picker — sets the active project
+```
+
+No projects yet?
+
+```bash
+af projects create --name my-first-project
+af projects switch my-first-project
+```
+
+## Verify
+
+```bash
+af whoami --json
+```
+
+Expected:
+
+```json
+{
+  "authenticated": true,
+  "user": { "id": "…", "email": "…", "username": null, "walletAddress": null },
+  "project": { "id": "…", "name": "…", "slug": "…" }
+}
+```
+
+Once both `authenticated: true` and `project` is non-null, the user is ready to deploy.
+
+## Next steps
+
+- Deploy a Docker image → use the `deploy-docker-app` skill
+- Deploy a static HTML site → use the `deploy-static-site` skill
+- Deploy from a pre-built template → use the `deploy-from-template` skill
+- Spin up a raw VM → use the `deploy-server` skill
+
+## Common setup hiccups
+
+- **`af: command not found`**: npm global bin not on PATH. `export PATH="$(npm config get prefix)/bin:$PATH"` in `~/.zshrc` / `~/.bashrc`.
+- **`Not logged in.`** after `af login`: keychain access denied. Run `af login --email` instead — falls back to a file-stored token in `~/.alternate-futures/`.
+- **Local dev**: append `--local` to every command (`af --local login`, `af --local services list`). Uses a separate token slot from prod.

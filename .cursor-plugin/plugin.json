@@ -1,12 +1,13 @@
 {
-  "name": "af-cli",
-  "description": "AlternateFutures CLI — deploy services, manage projects, SSH into workloads, and check billing from the terminal",
-  "version": "0.1.0",
+  "name": "alternate-cloud",
+  "description": "Deploy and manage workloads on Alternate Clouds (Akash + Spheron + Phala TEE) from any AI coding assistant. Bundles the `af` CLI reference plus task-specific skills for static sites, Docker apps, templates, raw servers, and troubleshooting.",
+  "version": "0.2.0",
   "author": {
     "name": "Alternate Futures",
     "email": "dev@alternatefutures.ai"
   },
   "license": "AGPL-3.0-only",
   "homepage": "https://alternatefutures.ai",
-  "keywords": ["cli", "cloud", "deploy", "akash", "decentralized"]
+  "repository": "https://github.com/alternatefutures/alternate-skills",
+  "keywords": ["cli", "cloud", "deploy", "akash", "spheron", "phala", "tee", "decentralized", "alternate-clouds"]
 }

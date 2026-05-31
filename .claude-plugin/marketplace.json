@@ -1,14 +1,14 @@
 {
-  "name": "af-plugins",
+  "name": "alternate-cloud",
   "owner": {
     "name": "Alternate Futures",
     "email": "dev@alternatefutures.ai"
   },
   "plugins": [
     {
-      "name": "af-cli",
+      "name": "alternate-cloud",
       "source": ".",
-      "description": "AlternateFutures CLI — deploy services, manage projects, SSH into workloads, and check billing from the terminal"
+      "description": "Deploy and manage workloads on Alternate Clouds (Akash + Spheron + Phala TEE) from any AI coding assistant."
     }
   ]
 }

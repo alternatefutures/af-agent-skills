@@ -22,6 +22,16 @@ af logout
 af whoami                 # who am I + which project; --json for machine output
 ```
 
+Both login flows mint a real personal access token (PAT). The PAT is stored
+in the OS keychain when available, otherwise in `~/.alternate-futures/token`
+(mode 0600) — never in plaintext JSON config. A legacy plaintext token is
+migrated automatically on first run. If a saved credential is rejected
+(401), the CLI clears it and asks you to `af login` again.
+
+Without a TTY (CI, piped), commands that would prompt fail fast with a
+non-zero exit instead of hanging — set `AF_TOKEN` for headless use.
+Cancelled interactive prompts (Ctrl+C / ESC) exit `130`, not `0`.
+
 `af whoami` exits non-zero when not authenticated — use it for pre-flight checks in scripts and skills:
 
 ```bash
@@ -80,7 +90,7 @@ Operate on the active project. Override with `-p <id-or-name>`:
 af services list
 af services -p my-project list
 af services info [id-or-name-or-slug]
-af services logs [id] --tail 100
+af services logs [id] --tail 100   # snapshot of recent lines — no --follow/stream mode
 af services close [id]    # stop active deployment (Akash / Spheron / Phala)
 af services delete [id]   # delete service (closes deployment first)
 ```
@@ -183,13 +193,17 @@ af ssh <serviceId> --service web      # target specific container
 af ssh <serviceId> --command /bin/sh  # custom shell
 ```
 
+The remote PTY owns echoing; predictive local echo is off by default
+(opt back in with `AF_SSH_LOCAL_ECHO=1` if you're on a high-latency link
+and accept possible double-printing under raw-mode programs).
+
 ## Regions, templates, billing, PATs
 
 ```bash
 af regions [--provider akash|phala] [--gpu h100|h200|a100|rtx4090]
 af templates list
 af templates info <templateId>
-af billing balance
+af billing balance        # wallet of the ACTIVE org (set at login / org switch)
 af pat list
 af pat create --name "CI token"
 af pat delete <tokenId>

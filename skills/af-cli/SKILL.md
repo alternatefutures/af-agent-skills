@@ -107,7 +107,7 @@ Top-level kind + per-kind source:
 
 | Flag | Purpose |
 |---|---|
-| `--kind <k>` | `template` \| `docker` \| `server` \| `function` \| `github` |
+| `--kind <k>` | `template` \| `docker` \| `server` (functions + GitHub deploys are dashboard-only) |
 | `--name <name>` | Service name (validated against project's unique-slug constraint up-front) |
 | `--template <id>` | (kind=template) skip the catalog browse |
 | `--image <ref>` | (kind=docker) Docker image, e.g. `nginx:latest` |
@@ -152,8 +152,9 @@ Same prompt chain as create; closes any active deployment first (auto-confirms u
 
 ```bash
 af services env list [service]
-af services env set <service> <key> <value>
+af services env set <service> <key> <value> [--secret]   # --secret masks it in `list`
 af services env unset <service> <key> [-y]
+af services env reveal <service> <key>                    # print one var's plaintext (incl. secrets)
 ```
 
 After any change, redeploy to apply: `af services deploy <service>`.
@@ -166,6 +167,43 @@ af services unlink [source] [target] [-y]
 ```
 
 Mirrors the web `ServiceLinker`. Redeploy the source service to materialize the new env keys.
+
+### `services ports` — published ports
+
+```bash
+af services ports list [service]
+af services ports add <service> <containerPort> [--public <n>] [--protocol tcp|http]
+af services ports remove <service> <containerPort> [-y]
+```
+
+### `services health` — application health probe
+
+```bash
+af services health show [service]
+af services health set <service> --path /healthz [--port <n>] [--expect 200] [--interval 30] [--timeout 5]
+af services health disable <service> [-y]
+```
+
+### `services failover` — health-aware auto-failover
+
+```bash
+af services failover show [service]
+af services failover enable <service> [--max-attempts 3] [--window-hours 24]
+af services failover disable <service> [-y]
+af services failover history [service]
+```
+
+Redeploys to a different provider on provider-side failure. Refused on services with persistent volumes (data-loss risk).
+
+### `services config` — edit the persisted service record
+
+```bash
+af services config show [service]
+af services config set <service> [--image <ref>] [--port <n>] [--priority <n>] \
+  [--volume name:/mount/path:size ...] [--clear-volumes]
+```
+
+All four (`ports` / `health` / `failover` / `config`) mirror the web Config tab. Redeploy to apply changes.
 
 ## Provider routing (server-side — user doesn't pick)
 

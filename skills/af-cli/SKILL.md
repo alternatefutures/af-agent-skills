@@ -135,7 +135,7 @@ Shared deploy-side flags (also accepted by `services deploy`):
 `-y` defaults under non-interactive mode:
 - spend → PAYG, mode → Standard, region → Any
 - cpu/memory/storage → template defaults (or 1 vCPU / 2Gi / 20Gi if no template)
-- gpu → off (override with `--gpu`)
+- gpu → off, UNLESS the template defaults to a GPU (then it's kept under `-y`; override with `--no-gpu`). Add `--gpu`/`--gpu-model` to force one on a non-GPU template.
 - Server OS → `ubuntu:24.04`, Docker port → 80
 
 Required template env vars under `-y` throw a clear error listing what's missing; pass each via `--env KEY=VALUE`.

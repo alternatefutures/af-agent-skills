@@ -238,14 +238,15 @@ and accept possible double-printing under raw-mode programs).
 ## Chat (end-to-end encrypted)
 
 Talk to a deployed **alt-chat** relay from the terminal — for humans and agents.
-No `af login` required (the room password is the only credential). See the
-`af-chat` skill for the full agent guide.
+No `af login` required (the passphrase is the only credential — it alone selects
+the room, there is no room name). See the `af-chat` skill for the full agent guide.
 
 ```bash
-af chat join [target]                 # interactive TUI (humans)
+af chat join [target]                 # interactive TUI (humans): /reply <ref>, @mentions, 👑
 af chat send [target] --message "hi" --json   # post one message, exit (agents/CI)
-af chat read [target] --json                  # print history, exit
-af chat read [target] --watch --json          # stream live (NDJSON)
+af chat send [target] --message "ok" --reply-to "<pubkey>:<seq>" --json   # thread a reply
+af chat read [target] --json                  # history; messages carry pubkey/seq/replyTo/edited/deleted
+af chat read [target] --watch --json          # stream live (NDJSON): message/edit/delete/join/sys-join…
 ```
 
 `[target]` = a URL/host (`https://chat.alternatefutures.ai`), your own service
@@ -253,9 +254,10 @@ name, or omitted (uses `AF_CHAT_URL`, else the public demo). Prefer env vars for
 secrets — `--password` on argv leaks via `ps`/history:
 
 ```bash
-export AF_CHAT_URL=https://chat.alternatefutures.ai AF_CHAT_ROOM=team \
+export AF_CHAT_URL=https://chat.alternatefutures.ai \
        AF_CHAT_PASSWORD=… AF_CHAT_USERNAME=claude-code AF_CHAT_IDENTITY=~/.af-chat-id
 af chat send --message "deploy finished" --json   # {"ok":true,…,"seq":7}
+# The passphrase ALONE selects the room (no room name); JSON "room" is the derived 2-word label.
 ```
 
 The relay is blind (ciphertext-only); the Ed25519 **fingerprint** — not the

@@ -14,22 +14,22 @@ one rather than chaining many.
 
 | If the user is asking to… | Use skill |
 |---|---|
-| install or configure the `af` CLI; first-time setup; pick a project | `af-setup` |
+| install or configure the `acc` CLI; first-time setup; pick a project | `af-setup` |
 | deploy a simple static HTML page or static site | `deploy-static-site` |
 | deploy a specific Docker image (their own or public) | `deploy-deck-app` |
 | deploy from one of AF's pre-built templates (databases, AI inference, game servers, etc.) | `deploy-from-template` |
 | spin up a raw VM with full SSH access | `deploy-server` |
 | debug a failed/stuck deployment; check logs; troubleshoot 503s | `troubleshoot-deployment` |
-| anything else CLI-related (any `af` command, any flag, billing, PATs) | `af-cli` |
+| anything else CLI-related (any `acc` command, any flag, billing, PATs) | `alternate-clouds-cli` |
 
 If the user is mid-conversation and the request doesn't cleanly match
-any skill, fall back to `af-cli` — it's the comprehensive reference.
+any skill, fall back to `alternate-clouds-cli` — it's the comprehensive reference.
 
 ## Core invariants (these apply to every skill)
 
-1. **Run `af whoami --json` first.** If `authenticated: false`, the
+1. **Run `acc whoami --json` first.** If `authenticated: false`, the
    pre-tool-use hook will block — but proactively checking lets you
-   prompt the user to `af login` before they hit the wall.
+   prompt the user to `acc login` before they hit the wall.
 
 2. **Use the `-y` flag for non-interactive runs.** All prompts have flag
    equivalents (`--kind`, `--name`, `--image`, `--port`, `--os`,
@@ -45,8 +45,8 @@ any skill, fall back to `af-cli` — it's the comprehensive reference.
    (Standard or Confidential via `--confidential`). The platform routes.
 
 4. **Local dev uses `--local`.** When the user is on a feature branch
-   or hitting localhost services, every `af` command takes `--local`
-   immediately after `af` (`af --local services list`). This uses a
+   or hitting localhost services, every `acc` command takes `--local`
+   immediately after `acc` (`acc --local services list`). This uses a
    separate token slot so prod creds aren't overwritten.
 
 5. **Required template env vars must be passed via `--env KEY=VALUE`
@@ -62,7 +62,7 @@ any skill, fall back to `af-cli` — it's the comprehensive reference.
 
 ## Where to find things
 
-- **Full CLI command surface**: `af --help` or `skills/af-cli/SKILL.md`
+- **Full CLI command surface**: `acc --help` or `skills/alternate-clouds-cli/SKILL.md`
 - **Live GPU catalog (model, VRAM, providers, price)**: the deploy
   flow's GPU prompt fetches this live from
   `app.alternatefutures.ai/api/providers/{akash,spheron}-gpu-availability`.

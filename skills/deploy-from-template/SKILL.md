@@ -12,7 +12,7 @@ provisions, configures env, and deploys end-to-end.
 ## Step 1 — auth check
 
 ```bash
-af whoami --json
+acc whoami --json
 ```
 
 Unauthenticated? Run the `af-setup` skill.
@@ -22,14 +22,14 @@ Unauthenticated? Run the `af-setup` skill.
 If the user named one (e.g. "ollama", "postgres"):
 
 ```bash
-af templates list | grep -i <name>
-af templates info <templateId>          # shows resources, ports, required env vars
+acc templates list | grep -i <name>
+acc templates info <templateId>          # shows resources, ports, required env vars
 ```
 
 If they didn't:
 
 ```bash
-af templates list                       # browse by category
+acc templates list                       # browse by category
 # Categories: AI_ML, GAME_SERVER, DATABASE, DEVTOOLS, WEB_SERVER, STORAGE
 ```
 
@@ -37,7 +37,7 @@ Pick the template id (typically slugged like `postgres-16`, `ollama`, `comfyui-s
 
 ## Step 3 — collect required env vars
 
-`af templates info <id>` lists `envVars` with a `required: true` flag.
+`acc templates info <id>` lists `envVars` with a `required: true` flag.
 Anything required must be passed via `--env KEY=VALUE` in `-y` mode —
 otherwise the deploy throws with a clear list of missing keys.
 
@@ -54,7 +54,7 @@ Platform-injected env vars (`generatedAccessKey`, `generatedSecret`, `orgId`, `a
 ## Step 4 — deploy
 
 ```bash
-af services create \
+acc services create \
   --kind template \
   --template <templateId> \
   --name <your-name> \
@@ -83,24 +83,24 @@ For confidential / TEE deploys:
 
 ## Composite templates
 
-If `af templates info <id>` shows `components: [...]` (a multi-service bundle — e.g. app+db+cache), the CLI refuses with a clear error and points at the dashboard. Composite templates need per-component provider routing that the CLI doesn't prompt for yet. Tell the user to deploy from `https://app.alternatefutures.ai` and circle back.
+If `acc templates info <id>` shows `components: [...]` (a multi-service bundle — e.g. app+db+cache), the CLI refuses with a clear error and points at the dashboard. Composite templates need per-component provider routing that the CLI doesn't prompt for yet. Tell the user to deploy from `https://app.alternatefutures.ai` and circle back.
 
 ## Step 5 — verify + connect
 
 ```bash
-af services info <your-name>
-af services logs <your-name> --tail 100
+acc services info <your-name>
+acc services logs <your-name> --tail 100
 ```
 
 The deploy poller prints connection details when ACTIVE:
 - Web/API templates → public URL
-- Database templates → internal hostname + port (use `af ssh` or `af services link` to wire to another service)
+- Database templates → internal hostname + port (use `acc ssh` or `acc services link` to wire to another service)
 - SSH-only templates → `ssh root@<ip> -p <port>`
 
 ## Example: Postgres
 
 ```bash
-af services create --kind template --template postgres-16 \
+acc services create --kind template --template postgres-16 \
   --name app-db \
   --env POSTGRES_PASSWORD="$(openssl rand -base64 24)" \
   --env POSTGRES_DB=app \
@@ -111,15 +111,15 @@ af services create --kind template --template postgres-16 \
 Then link your app service to it:
 
 ```bash
-af services link my-app app-db --alias DB
+acc services link my-app app-db --alias DB
 # DB_HOST / DB_PORT / DB_USER / DB_PASSWORD show up in my-app's env
-af services deploy my-app   # redeploy to materialize the new env keys
+acc services deploy my-app   # redeploy to materialize the new env keys
 ```
 
 ## Example: Ollama (GPU)
 
 ```bash
-af services create --kind template --template ollama \
+acc services create --kind template --template ollama \
   --name local-llm \
   --gpu --gpu-model h100 \
   --region us-east \
@@ -129,12 +129,12 @@ af services create --kind template --template ollama \
 Pull a model after it's live:
 
 ```bash
-af ssh local-llm --command "ollama pull llama3"
+acc ssh local-llm --command "ollama pull llama3"
 ```
 
 ## Common pitfalls
 
-- **"Template not found"** with `--template` → the id is wrong. Run `af templates list` and copy the exact id (templates are slug-cased, e.g. `postgres-16`, not `postgres:16`).
+- **"Template not found"** with `--template` → the id is wrong. Run `acc templates list` and copy the exact id (templates are slug-cased, e.g. `postgres-16`, not `postgres:16`).
 - **"Missing required template env vars"** under `-y` → the template requires keys you didn't pass. The error lists them; add each as `--env KEY=VALUE`.
 - **"Composite templates need per-component provider routing"** → use the dashboard, not the CLI.
-- Server-side resource validation: if the template declares a `minMemory` higher than your `--memory` override, the deploy will reject. Check `af templates info <id>` for floors.
+- Server-side resource validation: if the template declares a `minMemory` higher than your `--memory` override, the deploy will reject. Check `acc templates info <id>` for floors.

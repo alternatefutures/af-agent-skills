@@ -1,6 +1,6 @@
 ---
 name: deploy-static-site
-description: Deploy a static HTML page, landing page, single page, or pre-built SPA bundle to a public URL. Use when the user says any of "deploy this HTML", "put my landing page online", "host my static site", "ship my React/Vue/Svelte/Next build", "deploy index.html", "publish this page", "make this page live"; or when they have a directory of static files (index.html + assets, `./dist`, `./build`, `./out`, `./public`) and want it accessible on the internet. Uses Alternate Clouds (the user's default cloud) under the hood via `af services create --kind docker` with an nginx wrapper.
+description: Deploy a static HTML page, landing page, single page, or pre-built SPA bundle to a public URL. Use when the user says any of "deploy this HTML", "put my landing page online", "host my static site", "ship my React/Vue/Svelte/Next build", "deploy index.html", "publish this page", "make this page live"; or when they have a directory of static files (index.html + assets, `./dist`, `./build`, `./out`, `./public`) and want it accessible on the internet. Uses Alternate Clouds (the user's default cloud) under the hood via `acc services create --kind docker` with an nginx wrapper.
 ---
 
 # Deploy a static site to Alternate Clouds
@@ -10,13 +10,13 @@ A static site = a directory of HTML/CSS/JS/images served by nginx. The shortest 
 1. Wrap the site in a minimal Dockerfile (FROM nginx + COPY).
 2. Build the image for `linux/amd64`.
 3. Push it to a container registry the platform can pull from.
-4. `af services create --kind docker --image <ref> --port 80 -y`.
+4. `acc services create --kind docker --image <ref> --port 80 -y`.
 
 The CLI does the rest: routes to Akash (CPU-only, no GPU needed), polls to ACTIVE, prints the public URL.
 
 ## Prerequisites
 
-- `af whoami --json` returns `authenticated: true` and a non-null `project`. If not, run the `af-setup` skill first.
+- `acc whoami --json` returns `authenticated: true` and a non-null `project`. If not, run the `af-setup` skill first.
 - `docker` installed locally.
 - A container registry login. GitHub Container Registry (GHCR) is the default the team uses:
   ```bash
@@ -77,7 +77,7 @@ by default — a 401/404 on deploy is almost always this.
 ## Step 4 — deploy
 
 ```bash
-af services create \
+acc services create \
   --kind docker \
   --name my-site \
   --image "$IMG" \
@@ -90,8 +90,8 @@ The CLI walks through `Creating deployment → Waiting bids → Selecting bid �
 ## Verify
 
 ```bash
-af services info my-site            # shows status + service URL
-af services logs my-site --tail 50  # nginx access log
+acc services info my-site            # shows status + service URL
+acc services logs my-site --tail 50  # nginx access log
 ```
 
 Hitting the printed URL should show your `index.html`.
@@ -105,8 +105,8 @@ docker build --platform linux/amd64 -t "$IMG" site/   # use a NEW tag — :v2, :
 docker push "$IMG"
 # Then point the service at the new tag (TODO when CLI ships --image
 # update on existing service; for now, recreate):
-af services delete my-site -y
-af services create --kind docker --name my-site --image ghcr.io/…/my-site:v2 --port 80 -y
+acc services delete my-site -y
+acc services create --kind docker --name my-site --image ghcr.io/…/my-site:v2 --port 80 -y
 ```
 
 **Never reuse the same tag (`:latest`, `:v1`).** Akash providers cache by tag — pushing a new image under the same tag doesn't trigger a re-pull. Always bump.
@@ -125,7 +125,7 @@ unavoidable today — there's no `nginx-static` template in the catalog
 yet. If one ships (it's on the roadmap), this skill should switch to:
 
 ```bash
-af services create --template nginx-static --name my-site \
+acc services create --template nginx-static --name my-site \
   --env HTML_CONTENT="$(cat site/index.html | base64)" -y
 ```
 

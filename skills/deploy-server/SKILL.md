@@ -14,7 +14,7 @@ etc.) and runs `sleep infinity` so the container stays up for SSH.
 ## Step 1 — auth check
 
 ```bash
-af whoami --json
+acc whoami --json
 ```
 
 If not authenticated, run the `af-setup` skill.
@@ -37,7 +37,7 @@ Anything else: pass a full image ref (e.g. `nvidia/cuda:12.2.0-base-ubuntu22.04`
 ### CPU-only Ubuntu box
 
 ```bash
-af services create \
+acc services create \
   --kind server \
   --name dev-box \
   --os ubuntu:24.04 \
@@ -48,7 +48,7 @@ af services create \
 ### GPU box (e.g. for training / inference experiments)
 
 ```bash
-af services create \
+acc services create \
   --kind server \
   --name gpu-box \
   --os nvidia/cuda:12.2.0-base-ubuntu22.04 \
@@ -81,8 +81,8 @@ SSH:      ssh root@1.2.3.4 -p 22
 Or:
 
 ```bash
-af ssh dev-box                   # CLI-mediated WebSocket shell (works for Akash + Spheron)
-af ssh dev-box --command /bin/sh # specify shell
+acc ssh dev-box                   # CLI-mediated WebSocket shell (works for Akash + Spheron)
+acc ssh dev-box --command /bin/sh # specify shell
 ```
 
 ## Persistent storage
@@ -96,18 +96,18 @@ storage service.
 ## Common pitfalls
 
 - **GPU box stuck at "Starting workload" for 5+ minutes** → normal. Spheron VM cold-boot + cloud-init + GPU driver init routinely takes 5–10 min. The poller's 15-minute timeout is sized for this.
-- **`ssh: Connection refused`** → the SSH daemon takes a few extra seconds after the deploy says ACTIVE. Wait 15s and retry, or use `af ssh <name>` which uses the platform's WebSocket shell (no port-22 dependency).
-- **"FUNCTION services are not yet supported on Spheron"** → bug in older CLI builds. Update: `npm i -g @alternatefutures/cli` to ≥ v0.3.0.
+- **`ssh: Connection refused`** → the SSH daemon takes a few extra seconds after the deploy says ACTIVE. Wait 15s and retry, or use `acc ssh <name>` which uses the platform's WebSocket shell (no port-22 dependency).
+- **"FUNCTION services are not yet supported on Spheron"** → bug in older CLI builds. Update: `npm i -g @alternatefutures/acc` to ≥ v0.3.0.
 - **No `--os` flag with `-y`** → defaults to `ubuntu:24.04`. Matches the interactive picker's first choice.
-- **`Service name … already exists`** → pick a different `--name` or `af services delete <name> -y` first.
+- **`Service name … already exists`** → pick a different `--name` or `acc services delete <name> -y` first.
 
 ## Tear down
 
 ```bash
-af services close dev-box    # stop the deployment but keep the service record (resumable on next deploy)
-af services delete dev-box   # remove everything
+acc services close dev-box    # stop the deployment but keep the service record (resumable on next deploy)
+acc services delete dev-box   # remove everything
 ```
 
 For Spheron GPU VMs, billing is gated by a 20-minute server-side
-minimum-runtime contract — `af services close` warns when you're inside
+minimum-runtime contract — `acc services close` warns when you're inside
 the floor so you know you'll still be billed for the remainder.

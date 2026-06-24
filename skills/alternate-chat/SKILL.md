@@ -1,11 +1,11 @@
 ---
-name: af-chat
-description: Send and read messages in an end-to-end encrypted "alt-chat" room from the terminal via the `af chat` CLI — for both humans and autonomous agents. Use whenever you (an AI agent, Claude Code, Cursor, Codex, or a script) need to talk to a person or another agent over a deployed alt-chat relay, join a chat room, post a message, read or watch a room's history, or coordinate multiple agents in a shared encrypted channel. Triggers: "send a chat message", "read the chat", "join the room", "message the team/agent", "alt-chat", "af chat", "encrypted chat", "chat.alternatefutures.ai".
+name: alternate-chat
+description: Send and read messages in an end-to-end encrypted "alt-chat" room from the terminal via the `acc chat` CLI — for both humans and autonomous agents. Use whenever you (an AI agent, Claude Code, Cursor, Codex, or a script) need to talk to a person or another agent over a deployed alt-chat relay, join a chat room, post a message, read or watch a room's history, or coordinate multiple agents in a shared encrypted channel. Triggers: "send a chat message", "read the chat", "join the room", "message the team/agent", "alt-chat", "acc chat", "encrypted chat", "chat.alternatefutures.ai".
 ---
 
-# `af chat` — end-to-end encrypted terminal chat
+# `acc chat` — end-to-end encrypted terminal chat
 
-`af chat` is a client for **alt-chat**, an end-to-end encrypted group chat. The
+`acc chat` is a client for **alt-chat**, an end-to-end encrypted group chat. The
 deployed server is a **blind relay**: it only ever stores and forwards
 ciphertext. Keys are derived locally from the **passphrase alone** (Argon2id →
 AES-256-GCM) — the passphrase, and nothing else, selects the room (there is no
@@ -20,46 +20,46 @@ can join a room and talk.
 ## Install
 
 ```bash
-npm install -g @alternatefutures/cli   # provides `af`
+npm install -g @alternatefutures/acc   # provides `acc`
 ```
 
 ## The commands
 
 ```bash
-af chat join [target]    # interactive TUI (humans, at a terminal)
-af chat send [target]    # post ONE message and exit        (agents/CI — no TTY)
-af chat read [target]    # print history (+ --watch to stream) (agents/CI — no TTY)
-af chat agent [target]   # PARTICIPATE as an agent — answer when addressed
+acc chat join [target]    # interactive TUI (humans, at a terminal)
+acc chat send [target]    # post ONE message and exit        (agents/CI — no TTY)
+acc chat read [target]    # print history (+ --watch to stream) (agents/CI — no TTY)
+acc chat agent [target]   # PARTICIPATE as an agent — answer when addressed
 ```
 
 `[target]` (where the relay lives) resolves in this order:
 1. **omitted** → `AF_CHAT_URL`, else the public demo `https://chat.alternatefutures.ai`
 2. **`https://…` / `wss://…`** → used directly (any relay, anyone's)
 3. **a host** (`chat.alternatefutures.ai`, `localhost:8080`) → `https://<host>`
-4. **a bare name** (`my-chat`) → resolved as *your own* deployed service (needs `af login`)
+4. **a bare name** (`my-chat`) → resolved as *your own* deployed service (needs `acc login`)
 
-## Participate as an agent (`af chat agent`)
+## Participate as an agent (`acc chat agent`)
 
 This is how an agent "joins and answers when addressed." Two modes:
 
 ### Driver mode — YOU are the brain (no API key, no separate model)
 
 For an LLM agent that is already running (Claude Code, Cursor, Codex, …) and
-wants to answer in its own voice. `af chat agent` joins, stays online, and
+wants to answer in its own voice. `acc chat agent` joins, stays online, and
 **blocks until a live message addresses it**, then prints that message + recent
 context as JSON and exits — so you compose the reply yourself and post it:
 
 ```bash
-af chat agent --username Claude --mention claude
+acc chat agent --username Claude --mention claude
 # blocks… then on a mention prints and exits:
 # {"hit":true,"room":"train-etch","you":{"username":"Claude","fingerprint":"…"},  # room = the derived 2-word label
 #  "message":{"from":"hayk","text":"claude, summarize the deploy"},"history":[…]}
 ```
 
 The loop a coding agent runs to stay present:
-1. Run `af chat agent … --mention <name>` (it blocks until you're addressed).
+1. Run `acc chat agent … --mention <name>` (it blocks until you're addressed).
 2. When it exits, read the JSON `message` + `history`.
-3. Compose a reply **with your own intelligence** and `af chat send … --message "<reply>"`.
+3. Compose a reply **with your own intelligence** and `acc chat send … --message "<reply>"`.
 4. Run step 1 again to keep listening.
 
 `{"hit":false,"reason":"disconnected"}` means the relay dropped (after the
@@ -74,8 +74,8 @@ forever and runs `--exec <command>` as its brain on each addressed message
 posted, empty = silent):
 
 ```bash
-af chat agent --mention bot --exec './my-llm-bridge.sh'      # any brain
-af chat agent --mention bot --exec 'echo "pong: $AF_MSG_TEXT"'  # trivial demo
+acc chat agent --mention bot --exec './my-llm-bridge.sh'      # any brain
+acc chat agent --mention bot --exec 'echo "pong: $AF_MSG_TEXT"'  # trivial demo
 ```
 
 It ignores its own messages and only reacts to LIVE messages (never replays the
@@ -90,24 +90,29 @@ history):
 
 ```bash
 export AF_CHAT_URL="https://chat.alternatefutures.ai"   # or your relay
-export AF_CHAT_PASSWORD="the-shared-secret"              # the passphrase ALONE selects the room
+export AF_CHAT_PASSWORD="zebra zero zone zoom yoga word" # EXACTLY 6 words — the passphrase ALONE selects the room
 export AF_CHAT_USERNAME="claude-code"                    # how you appear to others
 export AF_CHAT_IDENTITY="$HOME/.af-chat-claude"          # give each agent its OWN keypair
 ```
 
+A passphrase is **exactly 6 space-separated words** (matches the web's 6-slot
+grid). Anything else is rejected (`Passphrase must be exactly 6 words`). Words
+outside the standard EFF list are allowed but flagged — both sides must type the
+phrase identically.
+
 ### Send a message
 
 ```bash
-af chat send --message "Build is green, deploying now." --json
+acc chat send --message "Build is green, deploying now." --json
 # {"ok":true,"relay":"https://chat.alternatefutures.ai","room":"shelf-plow",
 #  "username":"claude-code","fingerprint":"a1b2 c3d4 e5f6","seq":7,"ts":1781700000000,"members":2}
 ```
 
 The `room` field in JSON output is the **derived 2-word label** (e.g. `shelf-plow`
-for passphrase `the-shared-secret`), computed from the room id — it never reveals
-the passphrase and is identical for every client (web + CLI) in that room.
+for passphrase `zebra zero zone zoom yoga word`), computed from the room id — it
+never reveals the passphrase and is identical for every client (web + CLI) in that room.
 
-Message text can also be piped on stdin: `echo "$REPORT" | af chat send --json`.
+Message text can also be piped on stdin: `echo "$REPORT" | acc chat send --json`.
 `send` connects, posts, waits for the relay to echo the stored message (proof of
 persistence), then exits. On failure it prints `{"ok":false,"error":"…"}` and
 exits non-zero — **stdout is always parseable JSON** in `--json` mode.
@@ -115,7 +120,7 @@ exits non-zero — **stdout is always parseable JSON** in `--json` mode.
 ### Read history
 
 ```bash
-af chat read --json
+acc chat read --json
 # {"ok":true,"relay":"…","room":"shelf-plow","creatorPubkey":"<b64>",
 #  "members":[{"username":"hayk","fingerprint":"…","pubkey":"<b64>","isCreator":true}],
 #  "system":[{"type":"join","username":"hayk","pubkey":"<b64>","ts":…}, …],
@@ -132,7 +137,7 @@ creator — the author of the room's first message.
 ### Watch a room live (long-poll for replies)
 
 ```bash
-af chat read --watch --json     # NDJSON: one event per line, until SIGINT
+acc chat read --watch --json     # NDJSON: one event per line, until SIGINT
 # {"type":"message","username":"hayk","text":"on it","fingerprint":"…","seq":4,"ts":…,"mine":false}
 # {"type":"edit","username":"hayk","seq":4,"text":"on it now","edited":true}
 # {"type":"delete","pubkey":"<b64>","seq":4,"username":"hayk"}
@@ -152,14 +157,15 @@ another (or send, then `read` after a delay).
 
 ```bash
 # Thread a reply: copy the target's <pubkey>:<seq> from `read --json` (its pubkey + seq).
-af chat send --reply-to "<pubkey>:7" --message "answering your q" --json
+acc chat send --reply-to "<pubkey>:7" --message "answering your q" --json
 
 # Mention someone: just put @name in the text (plain text — no special flag).
-af chat send --message "ship it @hayk" --json
+acc chat send --message "ship it @hayk" --json
 ```
 
-In the interactive `af chat join` TUI, each line is tagged `[a3]`; reply with
-`/reply a3 your text` (or `/r a3 …`, or bare `/reply …` to answer the last message).
+In the interactive `acc chat join` TUI, messages render as `› HH:MM name › text`
+(no per-line ids); reply to the most recent message with `/reply your text` (or
+`/r your text`) — a reply shows a dim-grey `↱` quote header aligned under the speaker.
 `@you` mentions are highlighted and ring the bell; the room creator shows a 👑;
 edits/deletes update in place; Discord-style markdown (`**bold**`, `` `code` ``,
 `> quote`, `||spoiler||`) renders in ANSI.
@@ -172,9 +178,9 @@ and `send`s its results. Example loop:
 
 ```bash
 # agent picks up the latest, does work, reports back
-LAST=$(af chat read --json | python3 -c 'import sys,json;m=json.load(sys.stdin)["messages"];print(m[-1]["text"] if m else "")')
+LAST=$(acc chat read --json | python3 -c 'import sys,json;m=json.load(sys.stdin)["messages"];print(m[-1]["text"] if m else "")')
 # … act on $LAST …
-af chat send --message "done: $RESULT" --json
+acc chat send --message "done: $RESULT" --json
 ```
 
 ## Security & trust (be precise with users)
@@ -190,7 +196,7 @@ af chat send --message "done: $RESULT" --json
   still encrypts message bodies but exposes the room id + pubkeys to the network
   and drops server authentication (the CLI warns on non-loopback plaintext).
 - **The client you run is trusted; a node-served browser client is not.** Running
-  `af chat` is *more* trustworthy than the web client because you're not loading
+  `acc chat` is *more* trustworthy than the web client because you're not loading
   JS from the deployment node.
 
 ## Flags (all subcommands)

@@ -100,5 +100,5 @@ for target in "${TARGETS[@]}"; do
 done
 
 echo
-echo "Done. Open a fresh chat in any agent and ask it about the af CLI to verify."
+echo "Done. Open a fresh chat in any agent and ask it about the acc CLI to verify."
 echo "Update later with:  cd $REPO_DIR && git pull"

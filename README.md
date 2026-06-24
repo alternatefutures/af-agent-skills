@@ -5,7 +5,7 @@ deploy and manage workloads on **[Alternate Clouds](https://alternatefutures.ai)
 the multi-provider compute platform spanning Akash, Spheron GPU, and
 Phala TEE — through natural language.
 
-Bundles the `af` CLI reference plus task-specific skills for static
+Bundles the `acc` CLI reference plus task-specific skills for static
 sites, Docker apps, templates, raw servers, and troubleshooting. The
 assistant picks the right skill and walks the user (or itself) through
 the deploy end-to-end.
@@ -14,8 +14,8 @@ the deploy end-to-end.
 
 | Skill | When it triggers |
 |---|---|
-| `af-cli` | Comprehensive `af` CLI reference. Catch-all for any command/flag question. |
-| `af-setup` | First-time install + `af login` + project pick. |
+| `alternate-clouds-cli` | Comprehensive `acc` CLI reference. Catch-all for any command/flag question. |
+| `af-setup` | First-time install + `acc login` + project pick. |
 | `deploy-static-site` | "Put my HTML / SPA build online." |
 | `deploy-docker-app` | "Deploy my Docker image." |
 | `deploy-from-template` | "Spin up Postgres / Ollama / Redis / ..." |
@@ -25,7 +25,7 @@ the deploy end-to-end.
 Plus:
 
 - `AGENTS.md` — Codex's per-project rules entry point
-- `hooks/ensure-af-ready.sh` — Claude Code `PreToolUse` hook that verifies `af` is installed + the user is logged in before any tool call
+- `hooks/ensure-af-ready.sh` — Claude Code `PreToolUse` hook that verifies `acc` is installed + the user is logged in before any tool call
 - `install.sh` — auto-detects which agent(s) you have installed and wires the skills correctly
 
 ## Install
@@ -84,10 +84,10 @@ If your agent doesn't fit the above, copy each `skills/<name>/SKILL.md` into the
 ## Prerequisites
 
 - Node.js >= 18.18.2
-- The `af` CLI itself: `npm install -g @alternatefutures/cli`
-- A logged-in session: `af login`
+- The `acc` CLI itself: `npm install -g @alternatefutures/acc`
+- A logged-in session: `acc login`
 
-The `PreToolUse` hook in this plugin blocks any tool call that invokes `af` if the CLI isn't installed or the user isn't authenticated — with a clear hint on what to run.
+The `PreToolUse` hook in this plugin blocks any tool call that invokes `acc` if the CLI isn't installed or the user isn't authenticated — with a clear hint on what to run.
 
 ## Updating
 
@@ -126,9 +126,9 @@ alternate-skills/
 │   └── plugin.json
 ├── hooks/
 │   ├── hooks.json           # Claude Code hook registration
-│   └── ensure-af-ready.sh   # PreToolUse: af installed + logged in
+│   └── ensure-af-ready.sh   # PreToolUse: acc installed + logged in
 └── skills/
-    ├── af-cli/SKILL.md
+    ├── alternate-clouds-cli/SKILL.md
     ├── af-setup/SKILL.md
     ├── deploy-static-site/SKILL.md
     ├── deploy-docker-app/SKILL.md
@@ -139,7 +139,7 @@ alternate-skills/
 
 ## Links
 
-- CLI on npm: [@alternatefutures/cli](https://www.npmjs.com/package/@alternatefutures/cli)
+- CLI on npm: [@alternatefutures/acc](https://www.npmjs.com/package/@alternatefutures/acc)
 - Platform: [alternatefutures.ai](https://alternatefutures.ai)
 - Docs: [alternatefutures.ai/docs](https://alternatefutures.ai/docs)
 

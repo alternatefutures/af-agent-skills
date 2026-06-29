@@ -66,6 +66,26 @@ The GPU branch routes to Spheron first (GPU-native) and falls back to Akash on `
 ... --spend budget --budget-monthly 30   # cap monthly spend
 ```
 
+### Break-glass SSH key (recommended for GPU / long-running boxes)
+
+Add your own SSH public key at deploy time so you keep **direct** access to the
+box even if the platform's managed shell/heartbeat channel ever goes down:
+
+```bash
+acc services create --kind server --name gpu-box \
+  --os nvidia/cuda:12.2.0-base-ubuntu22.04 --gpu --gpu-model h100 \
+  --ssh-key-file ~/.ssh/id_ed25519.pub \
+  -y
+# or paste the key inline:
+#   --ssh-key "ssh-ed25519 AAAA… you@host"
+```
+
+The key is baked into the VM's `authorized_keys` (root + `ubuntu`) and replayed
+on resume. **Spheron (GPU) boxes only** — Akash/Phala ignore it. Reachability
+depends on the provider allowing inbound `:22` from your source IP (residential
+generally works; some datacenter ranges are filtered). This is a safety net, not
+a replacement for `acc ssh <name>`.
+
 ## Step 4 — SSH in
 
 After the deploy polls to ACTIVE, the CLI prints the SSH command directly:

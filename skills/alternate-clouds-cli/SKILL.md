@@ -113,6 +113,8 @@ Top-level kind + per-kind source:
 | `--image <ref>` | (kind=docker) Docker image, e.g. `nginx:latest` |
 | `--port <n>` | (kind=docker) container port, defaults to 80 under `-y` |
 | `--os <base>` | (kind=server) base OS image, e.g. `ubuntu:24.04` |
+| `--ssh-key <pubkey>` | (kind=server) break-glass OpenSSH public key (e.g. `"ssh-ed25519 AAAA…"`). Baked into the box's `authorized_keys` so you keep direct SSH even if the platform channel dies. Spheron raw boxes only — ignored on Akash/Phala. |
+| `--ssh-key-file <path>` | (kind=server) read the break-glass public key from a file, e.g. `~/.ssh/id_ed25519.pub`. Mutually exclusive with `--ssh-key`. |
 
 Shared deploy-side flags (also accepted by `services deploy`):
 

@@ -108,7 +108,7 @@ Top-level kind + per-kind source:
 | Flag | Purpose |
 |---|---|
 | `--kind <k>` | `template` \| `docker` \| `server` (functions + GitHub deploys are dashboard-only) |
-| `--name <name>` | Service name (validated against project's unique-slug constraint up-front) |
+| `--name <name>` | Service name. Unique **platform-wide** (the slug becomes the public `<slug>-app.alternatefutures.ai` subdomain), not just per-project. Collisions inside the current project are caught up-front; a name held by a service in another project (possibly another user's) surfaces as a server error at create time — pick a different name. |
 | `--template <id>` | (kind=template) skip the catalog browse |
 | `--image <ref>` | (kind=docker) Docker image, e.g. `nginx:latest` |
 | `--port <n>` | (kind=docker) container port, defaults to 80 under `-y` |

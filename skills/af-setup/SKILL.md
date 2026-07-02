@@ -21,7 +21,7 @@ Requires Node.js >= 18.18.2. Verify:
 acc --version
 ```
 
-If `af: command not found` after install, ensure the npm global bin dir is on PATH (`npm config get prefix` + `/bin`).
+If `acc: command not found` after install, ensure the npm global bin dir is on PATH (`npm config get prefix` + `/bin`).
 
 ## 2. Log in
 
@@ -83,6 +83,6 @@ Once both `authenticated: true` and `project` is non-null, the user is ready to 
 
 ## Common setup hiccups
 
-- **`af: command not found`**: npm global bin not on PATH. `export PATH="$(npm config get prefix)/bin:$PATH"` in `~/.zshrc` / `~/.bashrc`.
+- **`acc: command not found`**: npm global bin not on PATH. `export PATH="$(npm config get prefix)/bin:$PATH"` in `~/.zshrc` / `~/.bashrc`.
 - **`Not logged in.`** after `acc login`: keychain access denied. Run `acc login --email` instead — falls back to a file-stored token in `~/.alternate-futures/`.
 - **Local dev**: append `--local` to every command (`acc --local login`, `acc --local services list`). Uses a separate token slot from prod.

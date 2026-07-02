@@ -23,10 +23,10 @@ acc whoami                 # who am I + which project; --json for machine output
 ```
 
 Both login flows mint a real personal access token (PAT). The PAT is stored
-in the OS keychain when available, otherwise in `~/.alternate-futures/token`
-(mode 0600) — never in plaintext JSON config. A legacy plaintext token is
-migrated automatically on first run. If a saved credential is rejected
-(401), the CLI clears it and asks you to `acc login` again.
+in `~/.alternate-futures/token` (mode 0600) — never in plaintext JSON config.
+A legacy plaintext token is migrated automatically on first run. If a saved
+credential is rejected (401), the CLI clears it and asks you to `acc login`
+again.
 
 Without a TTY (CI, piped), commands that would prompt fail fast with a
 non-zero exit instead of hanging — set `AF_TOKEN` for headless use.
@@ -236,6 +236,22 @@ acc ssh <serviceId> --command /bin/sh  # custom shell
 The remote PTY owns echoing; predictive local echo is off by default
 (opt back in with `AF_SSH_LOCAL_ECHO=1` if you're on a high-latency link
 and accept possible double-printing under raw-mode programs).
+
+## Copy files (cp)
+
+Copy a single file to/from a deployment. Rides the same `/ws/shell` channel as
+`acc ssh` (base64-framed; no server change, no separate SSH/scp keys). Mark
+the remote side as `<serviceId>:<path>` — exactly one side must be remote.
+
+```bash
+acc cp ./local.bin <serviceId>:/root/model.bin     # upload   (local -> deployment)
+acc cp <serviceId>:/root/model.bin ./model.bin     # download (deployment -> local)
+acc cp <serviceId>:/root/f ./f --service web       # multi-service SDL: pick the service
+```
+
+Binary-safe and byte-exact (proven against a 127 MB model checkpoint).
+Requires the deployment to be `ACTIVE`. No recursive/directory mode yet —
+one file at a time; tar a directory first if needed.
 
 ## Chat (end-to-end encrypted)
 

@@ -290,10 +290,22 @@ acc regions [--provider akash|phala] [--gpu h100|h200|a100|rtx4090]
 acc templates list
 acc templates info <templateId>
 acc billing balance        # wallet of the ACTIVE org (set at login / org switch)
+acc billing topup --crypto --amount 25 \
+    [--chain base|ethereum|arbitrum|optimism|polygon] \  # default: base
+    [--token USDC|USDT|DAI] \                            # default: USDC
+    [--org <idOrSlug>] [--no-wait]
 acc pat list
 acc pat create --name "CI token"
 acc pat delete <tokenId>
 ```
+
+`billing topup` is crypto-only (card top-ups happen in the web dashboard) and
+needs the OWNER or ADMIN org role. It prints a stablecoin deposit address
+(plus a terminal QR when colors are supported) and polls the balance until
+the credit lands or the ~1-hour payment window expires; Ctrl-C while waiting
+is safe — funds credit automatically once the transfer confirms. Send ONLY
+the chosen token on the chosen network to the printed address. Max $10,000
+per top-up; creation is rate-limited to 10/min.
 
 ## Common non-interactive recipes
 

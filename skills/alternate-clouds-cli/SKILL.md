@@ -293,6 +293,7 @@ acc billing balance        # wallet of the ACTIVE org (set at login / org switch
 acc billing topup --crypto --amount 25 \
     [--chain base|ethereum|arbitrum|optimism|polygon] \  # default: base
     [--token USDC|USDT|DAI] \                            # default: USDC
+    [--refund-address <0x...>] \                         # prompted if omitted (interactive only)
     [--org <idOrSlug>] [--no-wait]
 acc pat list
 acc pat create --name "CI token"
@@ -306,6 +307,13 @@ the credit lands or the ~1-hour payment window expires; Ctrl-C while waiting
 is safe — funds credit automatically once the transfer confirms. Send ONLY
 the chosen token on the chosen network to the printed address. Max $10,000
 per top-up; creation is rate-limited to 10/min.
+
+A **refund address is required** (Relay's strict deposit-address quotes
+require `refundTo` as of 2026-07-30): if the sent amount doesn't exactly
+match the quote, the FULL amount is refunded to that address, so it must be
+one the user controls. Pass `--refund-address 0x...` (0x + 40 hex; the zero
+address is rejected) or, in an interactive terminal, the CLI prompts for it.
+Non-interactive runs without the flag fail before any request is made.
 
 ## Common non-interactive recipes
 

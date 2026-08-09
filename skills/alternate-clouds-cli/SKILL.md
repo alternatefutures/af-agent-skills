@@ -253,6 +253,28 @@ Binary-safe and byte-exact (proven against a 127 MB model checkpoint).
 Requires the deployment to be `ACTIVE`. No recursive/directory mode yet —
 one file at a time; tar a directory first if needed.
 
+**Shell-locked templates:** a template may declare `shellAccess: 'none'`
+(or a `hidden` file-access mode). On those services `acc ssh` and `acc cp`
+are refused server-side — "Shell access is disabled for this service by
+its template policy" — even for the owner. This is the lock behind
+attested/certified servers; it is not an auth failure, so don't retry.
+
+## Attestation (Phala TEE only)
+
+Fetch the hardware attestation report for a service running on Phala
+confidential compute. Works only when the service's active deployment is
+Phala; other providers return `ATTESTATION_UNAVAILABLE`.
+
+```bash
+acc attest <serviceId>            # human-readable summary + report
+acc attest <serviceId> --json     # full result as JSON (for agents/CI)
+```
+
+The report is relayed **verbatim and unverified** from the CVM
+(`phala cvms attestation`). Verifying the quote against Intel DCAP roots
+and a measurement allowlist is the caller's job — the platform is
+deliberately not in the trust path.
+
 ## Chat (end-to-end encrypted)
 
 Talk to a deployed **alt-chat** relay from the terminal — for humans and agents.

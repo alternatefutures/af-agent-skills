@@ -268,12 +268,32 @@ Phala; other providers return `ATTESTATION_UNAVAILABLE`.
 ```bash
 acc attest <serviceId>            # human-readable summary + report
 acc attest <serviceId> --json     # full result as JSON (for agents/CI)
+acc attest <serviceId> --verify   # + verify the quote client-side
 ```
 
 The report is relayed **verbatim and unverified** from the CVM
 (`phala cvms attestation`). Verifying the quote against Intel DCAP roots
 and a measurement allowlist is the caller's job — the platform is
 deliberately not in the trust path.
+
+`--verify` runs that check client-side (`@phala/dcap-qvl` pinned 0.6.1,
+collateral fetched from Intel's PCS, never Phala's PCCS): verifies the
+signature chain to Intel's roots, prints the TCB status and advisories,
+extracts the MRCONFIGID V1 measurement (`compose_hash`) and cross-checks
+it against the report's self-reported compose text. Exit code is 0 only
+when the chain verifies AND the TCB status is `UpToDate` (the same policy
+the attestation registry applies), so it is CI-safe. Combined with
+`--json`, the output gains a `verification` object: `{ measurement,
+composeHashMatches, tcbStatus, advisoryIds, tcbAccepted }`. Failure modes
+exit 1 with a `[CODE]` suffix: `NO_QUOTE_IN_REPORT`, `INVALID_QUOTE`,
+`UNSUPPORTED_REPORT_TYPE`, `MRCONFIGID_UNSUPPORTED`, `VERIFICATION_FAILED`.
+
+Server **identity** status (is this server's pubkey blessed by its org?)
+is not part of `--verify` — it is asserted by the public attestation
+registry endpoint, no auth required:
+`GET https://api.alternatefutures.ai/attestation-registry/v1/identity/<pubkey>`
+(the pubkey comes from the CVM's own `GET /identity` endpoint on
+attested-server deployments).
 
 ## Chat (end-to-end encrypted)
 

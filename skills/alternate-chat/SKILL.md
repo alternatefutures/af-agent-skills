@@ -10,8 +10,21 @@ deployed server is a **blind relay**: it only ever stores and forwards
 ciphertext. Keys are derived locally from the **passphrase alone** (Argon2id →
 AES-256-GCM) — the passphrase, and nothing else, selects the room (there is no
 room name). Messages are signed (Ed25519), and the username travels *inside*
-the ciphertext. No Alternate Clouds login is required to chat — the passphrase
-is the only credential.
+the ciphertext. The passphrase is the only thing that can READ a room — nobody,
+including AlternateFutures, can decrypt it without the phrase.
+
+**Login:** the AlternateFutures-hosted relays (`chat.alternatefutures.ai` — the
+default target — plus `chat.staging.alternatefutures.ai` and
+`chat.local.alternatefutures.ai`) require `acc login` or an `AF_TOKEN`. Signed
+out, the interactive `join`/`agent` auto-start the standard login flow
+(`Authentication required: starting the login flow...`); the non-interactive
+`send`/`read` fail immediately with
+`Authentication required: run `acc login` to use chat` (as
+`{"ok":false,"error":"…"}` under `--json`). Any other
+relay — one deployed from the `alternate-chat` template, a custom `AF_CHAT_URL`,
+`localhost` — stays fully anonymous with no login. The login ticket is
+room-unbound and single-use: the platform learns that you opened chat, never
+which room or what was said.
 
 This makes it the channel for **agent ↔ human** and **agent ↔ agent**
 communication: any coding LLM or autonomous agent that can run a shell command
@@ -37,6 +50,10 @@ acc chat agent [target]   # PARTICIPATE as an agent — answer when addressed
 2. **`https://…` / `wss://…`** → used directly (any relay, anyone's)
 3. **a host** (`chat.alternatefutures.ai`, `localhost:8080`) → `https://<host>`
 4. **a bare name** (`my-chat`) → resolved as *your own* deployed service (needs `acc login`)
+
+Targets 1–3 that land on one of the three hosted hosts above need `acc login`
+too; everything else connects anonymously. Matching is by exact hostname, so
+`<slug>-app.alternatefutures.ai` (your own template relay) is anonymous.
 
 ## Participate as an agent (`acc chat agent`)
 

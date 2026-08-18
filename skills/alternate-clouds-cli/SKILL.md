@@ -298,10 +298,24 @@ attested-server deployments).
 ## Chat (end-to-end encrypted)
 
 Talk to a deployed **alt-chat** relay from the terminal — for humans and agents.
-No `acc login` required (the passphrase is the only credential — it alone selects
-the room, there is no room name). A passphrase is **exactly 6 space-separated
-words** (e.g. `zebra zero zone zoom yoga word`); anything else is rejected. See
-the `alternate-chat` skill for the full agent guide.
+The passphrase alone selects the room (there is no room name) and is **exactly 6
+space-separated words** (e.g. `zebra zero zone zoom yoga word`); anything else is
+rejected. See the `alternate-chat` skill for the full agent guide.
+
+**The AlternateFutures-hosted relays require `acc login`** (or `AF_TOKEN`):
+`chat.alternatefutures.ai` (the default target), `chat.staging.alternatefutures.ai`,
+`chat.local.alternatefutures.ai`. The gate is checked **up front**, before the
+passphrase prompt or any room UI: signed out, `join`/`agent` run the SAME
+login guard as every other authed command (orange
+`Authentication required: starting the login flow...` notice, then the
+browser-link login). The non-interactive `send`/`read --json` never prompt —
+they return
+`{"ok":false,"error":"Authentication required: run \`acc login\` to use chat"}`.
+Any OTHER relay — one you deployed from the
+`alternate-chat` template, a custom `AF_CHAT_URL`, `localhost` — stays anonymous
+with no login. The passphrase is still the only thing that can read the room:
+login gates access to our relay, it does not give the platform your messages or
+even which room you joined.
 
 ```bash
 acc chat join [target]                 # interactive TUI (humans): /reply (last msg), @mentions, 👑
@@ -320,6 +334,15 @@ export AF_CHAT_URL=https://chat.alternatefutures.ai \
        AF_CHAT_PASSWORD=… AF_CHAT_USERNAME=claude-code AF_CHAT_IDENTITY=~/.af-chat-id
 acc chat send --message "deploy finished" --json   # {"ok":true,…,"seq":7}
 # The passphrase ALONE selects the room (no room name); JSON "room" is the derived 2-word label.
+# Hosted relay + signed out ⇒ {"ok":false,"error":"chat on chat.alternatefutures.ai requires…"}
+```
+
+For a hosted relay the api that mints the login ticket must be the SAME api the
+relay redeems it against, or every join returns `ticket rejected`:
+
+```bash
+AF_API_URL=https://api.staging.alternatefutures.ai \
+AF_CHAT_URL=https://chat.staging.alternatefutures.ai acc chat send --message hi --json
 ```
 
 The relay is blind (ciphertext-only); the Ed25519 **fingerprint** — not the

@@ -15,8 +15,9 @@ one rather than chaining many.
 | If the user is asking to… | Use skill |
 |---|---|
 | install or configure the `acc` CLI; first-time setup; pick a project | `af-setup` |
+| send, read, or participate in an encrypted `acc chat` room | `alternate-chat` |
 | deploy a simple static HTML page or static site | `deploy-static-site` |
-| deploy a specific Docker image (their own or public) | `deploy-deck-app` |
+| deploy a specific Docker image (their own or public) | `deploy-docker-app` |
 | deploy from one of AF's pre-built templates (databases, AI inference, game servers, etc.) | `deploy-from-template` |
 | spin up a raw VM with full SSH access | `deploy-server` |
 | debug a failed/stuck deployment; check logs; troubleshoot 503s | `troubleshoot-deployment` |
